@@ -2,124 +2,150 @@ package com.electrophone.androidlivedings;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.illposed.osc.OSCListener;
 import com.illposed.osc.OSCMessage;
-import com.illposed.osc.OSCPacket;
 import com.illposed.osc.OSCPortIn;
-import com.illposed.osc.OSCPortOut;
 
-import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
-public class OSCReceiver extends Service{
+public class OSCReceiver extends Service {
+    public static final String BROADCAST = "com.electrophone.androidlivedings.OSCReceiver.BROADCAST";
+    public static final String UPDATE_CURRENT_SCENE = "UPDATE_CURRENT_SCENE";
+    public static final String UPDATE_SCENES = "UPDATE_SCENES";
+    public static final String PORT_NR = "oscInPortNumber";
+    public static final int DEFAULT_DATA_OFFSET = 1;
+    private final ServiceBinder myServiceBinder = new ServiceBinder();
+    boolean updating = false;
     private String LOG_TAG = "com.electrophone.androidlivedings.OSCReceiver";
-
-    private static final String CURRENT_SCENE = "/mididings/current_scene";
-    private static final String BEGIN_SCENES = "/mididings/begin_scenes";
-    private static final String END_SCENES =  "/mididings/end_scenes";
-    private static final String ADD_SCENE =  "/mididings/add_scene";
-
-
+    private LocalBroadcastManager broadcaster = LocalBroadcastManager.getInstance(this);
+    private OSCPortIn oscReceiver;
+    private int oscInPortNr;
+    private int dataOffset = DEFAULT_DATA_OFFSET;
     private ArrayList<SceneInfo> scenes = null;
     private ArrayList<SceneInfo> updatedScenes = null;
-
-    private boolean sceneListUpdated = false;
-
-    private int currentSceneNr;
-    private int latestSceneNr;
-
-
-
-    private String oscInetAddr = "192.168.42.0.1";
-    private int oscInPortNr = 5000;
-
-    private OSCPortIn oscReceiver;
-
-    private OSCListener currentSceneListener = new OSCListener() {
+    private OSCListener dataOffsetListener = new OSCListener() {
         @Override
         public void acceptMessage(Date time, OSCMessage message) {
-            incomingCurrentSceneMessage(message);
+            dataOffset = (int) message.getArguments().get(0);
+            Log.d(LOG_TAG, logInfo("Incoming begin_scenes message", message));
         }
     };
     private OSCListener beginScenesListener = new OSCListener() {
         @Override
         public void acceptMessage(Date time, OSCMessage message) {
-            incomingBeginScenesMessage(message);
-        }
-    };
-    private OSCListener endScenesListener = new OSCListener() {
-        @Override
-        public void acceptMessage(Date time, OSCMessage message) {
-            incomingEndScenesMessage(message);
+            if (!updating) {
+                updating = true;
+                updatedScenes = new ArrayList<SceneInfo>();
+                Log.d(LOG_TAG, logInfo("Incoming begin_scenes message", message));
+            }
         }
     };
     private OSCListener addSceneListener = new OSCListener() {
         @Override
         public void acceptMessage(Date time, OSCMessage message) {
-            incomingAddSceneMessage(message);
+            Log.d(LOG_TAG, logInfo("Incoming add_scene message", message));
+            SceneInfo sceneInfo = createSceneInfoFromOscMessage(message);
+            if (sceneInfo != null) {
+                updatedScenes.add(sceneInfo);
+            } else {
+                Log.d(LOG_TAG, logInfo("Could not create SceneInfo from OSC message", message));
+            }
         }
     };
-
+    private OSCListener endScenesListener = new OSCListener() {
+        @Override
+        public void acceptMessage(Date time, OSCMessage message) {
+            if (updating) {
+                scenes = updatedScenes;
+                updating = false;
+                broadcastUpdatedScenes(scenes);
+                Log.d(LOG_TAG, logInfo("Incoming end_scenes message", message));
+            }
+        }
+    };
+    private OSCListener currentSceneListener = new OSCListener() {
+        @Override
+        public void acceptMessage(Date time, OSCMessage message) {
+            int currentSceneNr = (int) message.getArguments().get(0);
+            currentSceneNr -= dataOffset;
+            broadcastCurrentScene(scenes.get(currentSceneNr));
+            Log.d(LOG_TAG, logInfo("incomingCurrentSceneMessage", message));
+        }
+    };
 
     public OSCReceiver() {
     }
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
+    private void broadcastCurrentScene(SceneInfo sceneInfo) {
+        Intent intent = new Intent(BROADCAST);
+        intent.putExtra(UPDATE_CURRENT_SCENE, sceneInfo);
+        broadcaster.sendBroadcast(intent);
+    }
+
+    private void broadcastUpdatedScenes(ArrayList<SceneInfo> scenes) {
+        Intent intent = new Intent(BROADCAST);
+        //intent.putParcelableArrayListExtra(UPDATE_SCENES, scenes);
+        intent.putParcelableArrayListExtra(UPDATE_SCENES, scenes);
+        broadcaster.sendBroadcast(intent);
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    public IBinder onBind(Intent intent) {
         Bundle extras = intent.getExtras();
-        oscInetAddr = (String)extras.get("oscInetAddr");
-        oscInPortNr = (int) extras.get("oscInPort");
+        oscInPortNr = (int) extras.get(PORT_NR);
 
         startOSCserver();
-        return super.onStartCommand(intent, flags, startId);
+        if (scenes == null) {
+            try {
+                MidiDingsOSCParams oscParams = new MidiDingsOSCParams("192.168.42.1", 56418, MidiDingsOSCParams.QUERY);
+                OSCTransmitter transmitter = new OSCTransmitter(getBaseContext());
+                transmitter.execute(oscParams);
+            } catch (UnknownHostException e) {
+                Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_SHORT);
+            }
+        } else {
+            broadcastUpdatedScenes(scenes);
+        }
 
+        return myServiceBinder;
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        stopThreads();
+        return super.onUnbind(intent);
     }
 
     private void startOSCserver() {
         try {
+
             oscReceiver = new OSCPortIn(oscInPortNr);
+
             Log.d(LOG_TAG, "Adding listeners to server");
-            oscReceiver.addListener(CURRENT_SCENE, currentSceneListener);
-            oscReceiver.addListener(BEGIN_SCENES, beginScenesListener);
-            oscReceiver.addListener(ADD_SCENE, addSceneListener);
-            oscReceiver.addListener(END_SCENES, endScenesListener);
+            oscReceiver.addListener(MidiDingsOSCParams.DATA_OFFSET, dataOffsetListener);
+            oscReceiver.addListener(MidiDingsOSCParams.BEGIN_SCENES, beginScenesListener);
+            oscReceiver.addListener(MidiDingsOSCParams.ADD_SCENE, addSceneListener);
+            oscReceiver.addListener(MidiDingsOSCParams.END_SCENES, endScenesListener);
+            oscReceiver.addListener(MidiDingsOSCParams.CURRENT_SCENE, currentSceneListener);
+
             Log.d(LOG_TAG, "Starting OSC server");
             oscReceiver.startListening();
-            Log.d(LOG_TAG,"OSC server started");
+            Log.d(LOG_TAG, "OSC server started");
+
         } catch (SocketException e) {
             e.printStackTrace();
         }
-    }
-
-    private void incomingBeginScenesMessage(OSCMessage message) {
-        updatedScenes = new ArrayList<SceneInfo>();
-    }
-    private void incomingAddSceneMessage(OSCMessage message) {
-        //latestScene
-    }
-    private void incomingEndScenesMessage(OSCMessage message) {
-        scenes = updatedScenes;
-        updatedScenes = null;
-        sceneListUpdated = true;
-        //perform broadcast
-    }
-    private void incomingCurrentSceneMessage(OSCMessage message) {
-        currentSceneNr =  (int)message.getArguments().get(0);
     }
 
     @Override
@@ -128,17 +154,94 @@ public class OSCReceiver extends Service{
         super.onDestroy();
     }
 
-    private void stopThreads(){
+    public void stopThreads() {
         //stop all Threads
-        if(oscReceiver !=null) {
+        if (oscReceiver != null) {
             oscReceiver.stopListening();
+            oscReceiver.close();
             oscReceiver = null;
         }
     }
 
-    public void stopService(){
+    public void stopService() {
         stopThreads();
         stopSelf();
     }
 
+    public String logInfo(String s, OSCMessage msg) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(s);
+        sb.append(": ");
+        sb.append(msg.getAddress());
+        for (Object o : msg.getArguments()) {
+            sb.append(" [");
+            sb.append(o.toString());
+            sb.append(']');
+        }
+        return sb.toString();
+    }
+
+    public SceneInfo createSceneInfoFromOscMessage(OSCMessage msg) {
+        List oscArguments = msg.getArguments();
+        int noOfArgs = oscArguments.size();
+
+        boolean argsContainsScene = (noOfArgs >= 2);
+        if (argsContainsScene) {
+
+            int number;
+            String name;
+            ArrayList<SceneInfo> subscenes;
+
+            number = (int) oscArguments.get(0);
+            name = (String) oscArguments.get(1);
+            subscenes = new ArrayList<>();
+
+            for (int i = 2; i < noOfArgs; i++) {
+                int subsceneNumber = i - 1;
+                String subsceneName;
+                subsceneName = (String) oscArguments.get(i);
+
+                subscenes.add(new SceneInfo(subsceneNumber, subsceneName));
+            }
+
+            return new SceneInfo(number, name, subscenes);
+
+        } else {
+            return null;
+        }
+    }
+
+    private ArrayList<SceneInfo> generateTestData() {
+        String[] list = new String[]{
+                "Rhodes", "Brass", "Lead", "Strings", "Organ", "Guitar",
+                "Marimba", "Lead", "Bass", "Banjo", "Sitar", "Mandolin",
+                "Pad", "Synth Bass", "Bells", "Chimes", "Vibraphone",
+                "Wurlitzer", "Theremin"};
+
+        String scene;
+        int number;
+        ArrayList<SceneInfo> subscenes;
+        SceneInfo testDataItem;
+        ArrayList<SceneInfo> testData = new ArrayList<>();
+
+
+        for (int i = 0; i < list.length; i++) {
+            scene = list[i];
+            number = i;
+            subscenes = new ArrayList<>();
+            testDataItem = new SceneInfo(number, scene, subscenes);
+            testData.add(testDataItem);
+        }
+        return testData;
+    }
+
+    public ArrayList<SceneInfo> getSceneList() {
+        return scenes;
+    }
+
+    public class ServiceBinder extends Binder {
+        OSCReceiver getService() {
+            return OSCReceiver.this;
+        }
+    }
 }

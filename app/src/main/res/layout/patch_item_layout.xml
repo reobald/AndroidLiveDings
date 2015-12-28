@@ -1,26 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="fill_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
 
     <TextView
+        android:id="@+id/sceneNumber"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="001."
-        android:id="@+id/patchNumber"
-        android:paddingLeft="20dp"
-        android:paddingTop="10dp"
-        android:paddingRight="20dp"
         android:paddingBottom="10dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingTop="10dp"
+        android:text="---."
+        android:textAppearance="?android:attr/textAppearanceLarge"
         android:textSize="30dp" />
 
     <TextView
-        android:layout_width="wrap_content"
+        android:id="@+id/sceneName"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:text="Updating..."
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Patch Name"
-        android:id="@+id/patchName"
-        android:textSize="30dp"
-        android:textIsSelectable="false" />
+        android:textIsSelectable="false"
+        android:textSize="30dp" />
 </LinearLayout>

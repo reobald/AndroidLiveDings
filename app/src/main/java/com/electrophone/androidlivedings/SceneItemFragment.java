@@ -13,8 +13,8 @@ import android.widget.TextView;
  */
 public class SceneItemFragment extends Fragment {
 
-    private static TextView patchNumber;
-    private static TextView patchName;
+    private static TextView sceneNumber;
+    private static TextView sceneName;
 
 
     @Nullable
@@ -22,14 +22,14 @@ public class SceneItemFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.patch_item_layout, container, false);
-        patchNumber = (TextView) view.findViewById(R.id.patchNumber);
-        patchName = (TextView) view.findViewById(R.id.patchName);
+        sceneNumber = (TextView) view.findViewById(R.id.sceneNumber);
+        sceneName = (TextView) view.findViewById(R.id.sceneName);
         return view;
     }
 
-    public void setPatchInfo(int patchNumber, String patchName) {
-        String nr = String.format("%03d.", patchNumber);
-        this.patchNumber.setText(nr);
-        this.patchName.setText(patchName);
+    public void setSceneInfo(SceneInfo sceneInfo) {
+        String nr = String.format("%03d.", sceneInfo.getNumber());
+        this.sceneNumber.setText(nr);
+        this.sceneName.setText(sceneInfo.getSceneName());
     }
 }
