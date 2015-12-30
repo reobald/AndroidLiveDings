@@ -1,103 +1,138 @@
 package com.electrophone.androidlivedings;
 
-
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.support.v4.content.LocalBroadcastManager;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.Toast;
 
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
-    public static final String LOG_TAG = "MainActivity";
-    OSCReceiver oscReceiver;
-    boolean isBound = false;
-    private BroadcastReceiver receiver;
-    private ServiceConnection myOscServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            OSCReceiver.ServiceBinder binder = (OSCReceiver.ServiceBinder) service;
-            oscReceiver = binder.getService();
-            isBound = true;
-        }
+public class MainActivity extends AppCompatActivity implements LogConstant {
 
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            isBound = false;
-        }
-    };
-
+    public static final String SAVED_SCENES = "SAVED_SCENES";
+    public static final String SAVED_CURRENT_SCENE = "SAVED_CURRENT_SCENE";
+    public static final String SAVED_DATA_OFFSET = "SAVED_DATA_OFFSET";
+    OSCUpdatesHandler handler;
+    private ArrayList<SceneInfo> scenes = null;
+    private int oscInPortNumber = 56419;
+    private int oscOutPortNumber = 56418;
+    private String oscRemoteHost = "192.168.42.1";
+    private int dataOffset;
+    private OSCReceiver oscReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
 
-                SceneInfo currentScene = intent.getParcelableExtra(OSCReceiver.UPDATE_CURRENT_SCENE);
-                if (currentScene != null) {
-                    updateCurrentScene(currentScene);
-                    return;
-                }
+        handler = new OSCUpdatesHandler(this);
 
-                ArrayList<SceneInfo> sceneInfoList = intent.getParcelableArrayListExtra(OSCReceiver.UPDATE_SCENES);
-                if (sceneInfoList != null) {
-                    updateSceneList(sceneInfoList);
-                    return;
-                }
+        oscReceiver = new OSCReceiver(this, oscInPortNumber);
+        oscReceiver.startOSCserver();
+        try {
+//            wait for server to become active
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        if (savedInstanceState != null) {
+
+            scenes = savedInstanceState.getParcelableArrayList(SAVED_SCENES);
+
+            if (scenes != null) {
+                log("Recreating saved instance state");
+                dataOffset = savedInstanceState.getInt(SAVED_DATA_OFFSET);
+                setDataOffset(dataOffset);
+
+                int currentScene = savedInstanceState.getInt(SAVED_CURRENT_SCENE);
+                updateCurrentScene(currentScene);
+                updateSceneList(scenes);
             }
-        };
-        this.bindToService();
+
+        } else {
+            log("transmit query");
+            transmitQuery();
+        }
     }
 
-    public void bindToService() {
-        Intent serviceIntent = new Intent(getBaseContext(), OSCReceiver.class);
-        serviceIntent.putExtra(OSCReceiver.PORT_NR, 56419);
-        Log.d(LOG_TAG, "Calling bindToService(Intent)");
-        bindService(serviceIntent, myOscServiceConnection, BIND_AUTO_CREATE);
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        log("Saving instancs state");
+        outState.putParcelableArrayList(SAVED_SCENES, scenes);
+        outState.putInt(SAVED_CURRENT_SCENE, getCurrentScene());
+        outState.putInt(SAVED_DATA_OFFSET, dataOffset);
+        super.onSaveInstanceState(outState);
     }
 
-    public void updateCurrentScene(SceneInfo sceneInfo) {
+    @Override
+    protected void onRestart() {
+        log("Restarting");
+        super.onRestart();
+        oscReceiver.restartOSCserver();
+    }
+
+    @Override
+    protected void onStop() {
+        log("Stopping");
+        super.onStop();
+        oscReceiver.stop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        log("destroying");
+        super.onDestroy();
+        oscReceiver.destroy();
+    }
+
+    private void transmitQuery() {
+        OSCTransmitter transmitter = new OSCTransmitter(this);
+        try {
+            MidiDingsOSCParams params = new MidiDingsOSCParams(oscRemoteHost, oscOutPortNumber, MidiDingsOSCParams.QUERY);
+            log("OSCparams: " + params.toString());
+            transmitter.execute(params);
+        } catch (UnknownHostException e) {
+            log(e.getMessage());
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public int getCurrentScene() {
+        log("Get current scene");
+        SceneItemFragment sceneItemFragment = (SceneItemFragment) getSupportFragmentManager().findFragmentById(R.id.sceneItemFragment);
+        int sceneNumber = sceneItemFragment.getSceneNumber() - dataOffset;
+        return (sceneNumber < 0 ? 0 : sceneNumber);
+    }
+
+    public void updateCurrentScene(int sceneNumber) {
+        log("Update current scene");
+        SceneInfo sceneInfo = scenes.get(sceneNumber);
         SceneItemFragment sceneItemFragment = (SceneItemFragment) getSupportFragmentManager().findFragmentById(R.id.sceneItemFragment);
         sceneItemFragment.setSceneInfo(sceneInfo);
     }
 
     public void updateSceneList(ArrayList<SceneInfo> sceneInfoList) {
+        log("Update current scene list");
+        scenes = sceneInfoList;
         SceneListFragment sceneListFragment = (SceneListFragment) getSupportFragmentManager().findFragmentById(R.id.sceneListFragment);
         sceneListFragment.setSceneList(sceneInfoList);
     }
 
-    @Override
-    protected void onStart() {
-
-        LocalBroadcastManager.getInstance(this).registerReceiver((receiver),
-                new IntentFilter(OSCReceiver.BROADCAST));
-        super.onStart();
+    public Handler getHandler() {
+        return handler;
     }
 
-
-    @Override
-    protected void onStop() {
-        unbindService(myOscServiceConnection);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
-        super.onStop();
+    public void setDataOffset(int dataOffset) {
+        this.dataOffset = dataOffset;
     }
 
-    @Override
-    protected void onDestroy() {
-        oscReceiver.stopThreads();
-        super.onDestroy();
+    private void log(String msg) {
+        Log.d(LOG_TAG, msg);
     }
-
 
 }
 

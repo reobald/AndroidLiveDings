@@ -13,9 +13,11 @@ import android.widget.TextView;
  */
 public class SceneItemFragment extends Fragment {
 
-    private static TextView sceneNumber;
-    private static TextView sceneName;
+    private static final String DELIMITER = ".";
+    private static final String FORMAT = "%03d" + DELIMITER;
 
+    private TextView sceneNumber;
+    private TextView sceneName;
 
     @Nullable
     @Override
@@ -28,8 +30,17 @@ public class SceneItemFragment extends Fragment {
     }
 
     public void setSceneInfo(SceneInfo sceneInfo) {
-        String nr = String.format("%03d.", sceneInfo.getNumber());
+        String nr = String.format(FORMAT, sceneInfo.getNumber());
         this.sceneNumber.setText(nr);
         this.sceneName.setText(sceneInfo.getSceneName());
+    }
+
+    public int getSceneNumber() {
+        String t = sceneNumber.getText().toString();
+        String delimiters = DELIMITER;
+        String[] tokens = t.split(delimiters);
+        if (tokens.length > 0) {
+            return Integer.getInteger(tokens[0]);
+        } else return 0;
     }
 }

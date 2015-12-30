@@ -31,7 +31,7 @@ public class SceneInfo implements Parcelable {
         sceneName = in.readString();
         int numberOfSubScenes = in.readInt();
 
-        subscenes = new ArrayList<SceneInfo>(numberOfSubScenes);
+        subscenes = new ArrayList<>(numberOfSubScenes);
         for (int i = 0; i < numberOfSubScenes; i++) {
             int subsceneNumber = in.readInt();
             String subSceneName = in.readString();

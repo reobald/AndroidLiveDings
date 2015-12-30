@@ -15,8 +15,7 @@ import java.util.ArrayList;
 /**
  * Created by Patrik on 15-12-20.
  */
-public class OSCTransmitter extends AsyncTask {
-    private final String LOG_TAG = "OSCTransmitter";
+public class OSCTransmitter extends AsyncTask<Object, Void, Boolean> implements LogConstant {
 
     private Context context;
 
