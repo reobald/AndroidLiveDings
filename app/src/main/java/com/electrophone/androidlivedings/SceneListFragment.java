@@ -42,11 +42,11 @@ public class SceneListFragment extends Fragment {
         try {
 
             MidiDingsOSCParams oscParams = new MidiDingsOSCParams("192.168.42.1", 56418, MidiDingsOSCParams.SWITCH_SCENE);
-            oscParams.addParam(new Integer(sceneInfo.getNumber()));
+            oscParams.addParam(sceneInfo.getNumber());
             OSCTransmitter transmitter = new OSCTransmitter(getContext());
             transmitter.execute(oscParams);
         } catch (UnknownHostException e) {
-            Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT);
+            Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
