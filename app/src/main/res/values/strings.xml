@@ -1,6 +1,16 @@
 <resources>
     <string name="app_name">AndroidLiveDings</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="menu_item_settings_title">Settings</string>
+
+    <string name="pref_category_osc_output_title">Output</string>
+    <string name="pref_osc_remote_host_title">Midirig host IP address</string>
+    <string name="pref_osc_remote_host_summary"></string>
+    <string name="pref_osc_output_port_title">Midirig host port</string>
+    <string name="pref_osc_output_port_summary">The port to send OSC messages to</string>
+
+    <string name="pref_category_osc_input_title">Input</string>
+    <string name="pref_osc_input_port_title">Input port</string>
+    <string name="pref_osc_input_port_summary">The port number on this device to listen for incoming OSC messages on</string>
+
 </resources>

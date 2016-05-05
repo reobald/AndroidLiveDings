@@ -1,9 +1,15 @@
 package com.electrophone.androidlivedings;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import java.net.UnknownHostException;
@@ -16,9 +22,6 @@ public class MainActivity extends AppCompatActivity implements LogConstant {
     public static final String SAVED_DATA_OFFSET = "SAVED_DATA_OFFSET";
     OSCUpdatesHandler handler;
     private ArrayList<SceneInfo> scenes = null;
-    private int oscInPortNumber = 56419;
-    private int oscOutPortNumber = 56418;
-    private String oscRemoteHost = "192.168.42.1";
     private int dataOffset;
     private OSCReceiver oscReceiver;
 
@@ -27,9 +30,11 @@ public class MainActivity extends AppCompatActivity implements LogConstant {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        initPreferences();
+
         handler = new OSCUpdatesHandler(this);
 
-        oscReceiver = new OSCReceiver(this, oscInPortNumber);
+        oscReceiver = new OSCReceiver(this);
         oscReceiver.startOSCserver();
         try {
 //            wait for server to become active
@@ -58,6 +63,24 @@ public class MainActivity extends AppCompatActivity implements LogConstant {
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.settings:
+                Intent i = new Intent(com.electrophone.androidlivedings.MainActivity.this, com.electrophone.androidlivedings.SettingsActivity.class);
+                startActivity(i);
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -92,7 +115,9 @@ public class MainActivity extends AppCompatActivity implements LogConstant {
     private void transmitQuery() {
         OSCTransmitter transmitter = new OSCTransmitter(this);
         try {
-            MidiDingsOSCParams params = new MidiDingsOSCParams(oscRemoteHost, oscOutPortNumber, MidiDingsOSCParams.QUERY);
+            String oscRemoteHost = getOscRemoteHostFromPreferences();
+            int oscOutPortNr = getOscOutPortNumberFromPreferences();
+            MidiDingsOSCParams params = new MidiDingsOSCParams(oscRemoteHost, oscOutPortNr, MidiDingsOSCParams.QUERY);
             log("OSCparams: " + params.toString());
             transmitter.execute(params);
         } catch (UnknownHostException e) {
@@ -132,6 +157,25 @@ public class MainActivity extends AppCompatActivity implements LogConstant {
 
     private void log(String msg) {
         Log.d(LOG_TAG, msg);
+    }
+
+    private void initPreferences() {
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+    }
+
+    private String getOscRemoteHostFromPreferences() {
+        return getPrefValueByKey(SettingsActivity.KEY_PREF_OSC_REMOTE_HOST, "");
+    }
+
+    private int getOscOutPortNumberFromPreferences() {
+        String s = getPrefValueByKey(SettingsActivity.KEY_PREF_OSC_OUTPUT_PORT, "");
+        return new Integer(s);
+    }
+
+    private String getPrefValueByKey(String key, String defaultValue) {
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        return prefs.getString(key, defaultValue);
     }
 
 }

@@ -1,9 +1,11 @@
 package com.electrophone.androidlivedings;
 
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.illposed.osc.OSCListener;
@@ -27,8 +29,7 @@ public class OSCReceiver implements LogConstant {
 
     boolean updating = false;
     private OSCPortIn oscPort;
-    private int oscInPortNr;
-    private int dataOffset;
+    private int dataOffset = DEFAULT_DATA_OFFSET;
     private ArrayList<SceneInfo> updatedScenes = null;
 
     private MainActivity mainActivity;
@@ -82,20 +83,15 @@ public class OSCReceiver implements LogConstant {
         }
     };
 
-    public OSCReceiver(MainActivity mainActivity, int oscInPortNumber) {
-        this(mainActivity, oscInPortNumber, DEFAULT_DATA_OFFSET);
-    }
 
-    public OSCReceiver(MainActivity mainActivity, int oscInPortNumber, int dataOffset) {
+    public OSCReceiver(MainActivity mainActivity) {
         this.mainActivity = mainActivity;
-        this.oscInPortNr = oscInPortNumber;
-        this.dataOffset = dataOffset;
         startOSCserver();
     }
 
     public void startOSCserver() {
         try {
-
+            int oscInPortNr = getOscInPortNr();
             oscPort = new OSCPortIn(oscInPortNr);
 
             log("Adding listeners to server");
@@ -107,7 +103,7 @@ public class OSCReceiver implements LogConstant {
 
             log("Starting OSC server");
             oscPort.startListening();
-            log("OSC server started");
+            log("OSC server started, listening on port number: " + Integer.toString(oscInPortNr));
 
         } catch (SocketException e) {
             e.printStackTrace();
@@ -141,6 +137,12 @@ public class OSCReceiver implements LogConstant {
             oscPort = null;
         }
 
+    }
+
+    private int getOscInPortNr() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mainActivity);
+        int oscInPortNr = new Integer(prefs.getString(SettingsActivity.KEY_PREF_OSC_INPUT_PORT, ""));
+        return oscInPortNr;
     }
 
 

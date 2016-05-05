@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference
+        android:defaultValue="192.168.0.1"
+        android:key="pref_osc_remote_host"
+        android:persistent="true"
+        android:summary="@string/pref_osc_remote_host_summary"
+        android:title="@string/pref_osc_remote_host_title" />
+    <EditTextPreference
+        android:defaultValue="56418"
+        android:key="pref_osc_output_port"
+        android:maxLength="5"
+        android:numeric="integer"
+        android:persistent="true"
+        android:summary="@string/pref_osc_output_port_summary"
+        android:title="@string/pref_osc_output_port_title" />
+    <EditTextPreference
+        android:defaultValue="56419"
+        android:key="pref_osc_input_port"
+        android:maxLength="5"
+        android:numeric="integer"
+        android:persistent="true"
+        android:summary="@string/pref_osc_input_port_summary"
+        android:title="@string/pref_osc_input_port_title" />
+</PreferenceScreen>
