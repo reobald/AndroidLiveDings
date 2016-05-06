@@ -1,4 +1,4 @@
-package com.electrophone.androidlivedings;
+package com.electrophone.midirig;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

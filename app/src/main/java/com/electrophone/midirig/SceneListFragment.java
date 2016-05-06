@@ -1,4 +1,4 @@
-package com.electrophone.androidlivedings;
+package com.electrophone.midirig;
 
 import android.app.Fragment;
 import android.os.Bundle;

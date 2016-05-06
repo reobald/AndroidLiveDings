@@ -7,11 +7,11 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.electrophone.androidlivedings.MainActivity">
+    tools:context="com.electrophone.midirig.MainActivity">
 
     <fragment
         android:id="@+id/sceneItemFragment"
-        android:name="com.electrophone.androidlivedings.SceneItemFragment"
+        android:name="com.electrophone.midirig.SceneItemFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -28,7 +28,7 @@
 
     <fragment
         android:id="@+id/sceneListFragment"
-        android:name="com.electrophone.androidlivedings.SceneListFragment"
+        android:name="com.electrophone.midirig.SceneListFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/sceneItemFragment"

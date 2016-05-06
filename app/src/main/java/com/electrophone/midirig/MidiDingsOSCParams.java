@@ -1,4 +1,4 @@
-package com.electrophone.androidlivedings;
+package com.electrophone.midirig;
 
 import android.util.Log;
 

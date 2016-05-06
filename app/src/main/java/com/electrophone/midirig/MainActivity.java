@@ -1,4 +1,4 @@
-package com.electrophone.androidlivedings;
+package com.electrophone.midirig;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -75,7 +75,7 @@ public class MainActivity extends Activity implements LogConstant {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.settings:
-                Intent i = new Intent(com.electrophone.androidlivedings.MainActivity.this, com.electrophone.androidlivedings.SettingsActivity.class);
+                Intent i = new Intent(com.electrophone.midirig.MainActivity.this, com.electrophone.midirig.SettingsActivity.class);
                 startActivity(i);
             default:
                 return super.onOptionsItemSelected(item);

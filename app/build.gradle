@@ -5,7 +5,7 @@ android {
     buildToolsVersion "23.0.2"
 
     defaultConfig {
-        applicationId "com.electrophone.androidlivedings"
+        applicationId "com.electrophone.midirig"
         minSdkVersion 21
         targetSdkVersion 23
         versionCode 1
