@@ -37,16 +37,15 @@ public class SceneListFragment extends Fragment {
     }
 
     private void selectScene(SceneInfo sceneInfo) {
-        //patchitemListener.updateCurrentScene(sceneInfo);
 
         try {
 
-            MidiDingsOSCParams oscParams = new MidiDingsOSCParams("192.168.42.1", 56418, MidiDingsOSCParams.SWITCH_SCENE);
+            MidiDingsOSCParams oscParams = new MidiDingsOSCParams(getActivity(), MidiDingsOSCParams.SWITCH_SCENE);
             oscParams.addParam(sceneInfo.getNumber());
-            OSCTransmitter transmitter = new OSCTransmitter(getContext());
+            OSCTransmitter transmitter = new OSCTransmitter(getActivity());
             transmitter.execute(oscParams);
         } catch (UnknownHostException e) {
-            Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 

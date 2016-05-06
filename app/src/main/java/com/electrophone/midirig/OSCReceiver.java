@@ -86,7 +86,7 @@ public class OSCReceiver implements LogConstant {
 
     public OSCReceiver(MainActivity mainActivity) {
         this.mainActivity = mainActivity;
-        startOSCserver();
+        //startOSCserver();
     }
 
     public void startOSCserver() {

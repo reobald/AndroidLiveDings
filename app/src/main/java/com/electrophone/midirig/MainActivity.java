@@ -2,7 +2,6 @@ package com.electrophone.midirig;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -38,7 +37,7 @@ public class MainActivity extends Activity implements LogConstant {
         oscReceiver.startOSCserver();
         try {
 //            wait for server to become active
-            Thread.sleep(100);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -84,7 +83,7 @@ public class MainActivity extends Activity implements LogConstant {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        log("Saving instancs state");
+        log("Saving instance state");
         outState.putParcelableArrayList(SAVED_SCENES, scenes);
         outState.putInt(SAVED_CURRENT_SCENE, getCurrentScene());
         outState.putInt(SAVED_DATA_OFFSET, dataOffset);
@@ -115,9 +114,7 @@ public class MainActivity extends Activity implements LogConstant {
     private void transmitQuery() {
         OSCTransmitter transmitter = new OSCTransmitter(this);
         try {
-            String oscRemoteHost = getOscRemoteHostFromPreferences();
-            int oscOutPortNr = getOscOutPortNumberFromPreferences();
-            MidiDingsOSCParams params = new MidiDingsOSCParams(oscRemoteHost, oscOutPortNr, MidiDingsOSCParams.QUERY);
+            MidiDingsOSCParams params = new MidiDingsOSCParams(this, MidiDingsOSCParams.QUERY);
             log("OSCparams: " + params.toString());
             transmitter.execute(params);
         } catch (UnknownHostException e) {
@@ -161,21 +158,6 @@ public class MainActivity extends Activity implements LogConstant {
 
     private void initPreferences() {
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-    }
-
-    private String getOscRemoteHostFromPreferences() {
-        return getPrefValueByKey(SettingsActivity.KEY_PREF_OSC_REMOTE_HOST, "");
-    }
-
-    private int getOscOutPortNumberFromPreferences() {
-        String s = getPrefValueByKey(SettingsActivity.KEY_PREF_OSC_OUTPUT_PORT, "");
-        return new Integer(s);
-    }
-
-    private String getPrefValueByKey(String key, String defaultValue) {
-        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        return prefs.getString(key, defaultValue);
     }
 
 }

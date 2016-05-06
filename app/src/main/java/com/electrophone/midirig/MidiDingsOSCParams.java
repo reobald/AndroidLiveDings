@@ -1,5 +1,8 @@
 package com.electrophone.midirig;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.net.UnknownHostException;
@@ -27,26 +30,15 @@ public class MidiDingsOSCParams {
     public static final String ADD_SCENE = "/mididings/add_scene";
     public static final String END_SCENES = "/mididings/end_scenes";
     public static final String CURRENT_SCENE = "/mididings/current_scene";
-    public static final int DEFAULT_IN_PORT = 56418;
-    public static final int DEFAULT_OUT_PORT = 56419;
-    public static final String DEFAULT_INET_ADDR = "192.168.42.1";
     private static final String LOG_TAG = "MidiDingsOSCParams";
     private String inetAddress;
     private int port;
     private String cmd;
     private ArrayList params;
 
-    public MidiDingsOSCParams(String cmd) throws UnknownHostException {
-        setInetAddress(DEFAULT_INET_ADDR);
-        this.port = DEFAULT_OUT_PORT;
-        this.cmd = cmd;
-        this.params = new ArrayList();
-        Log.d(LOG_TAG, this.toString());
-    }
-
-    public MidiDingsOSCParams(String inetAddress, int port, String cmd) throws UnknownHostException {
-        setInetAddress(inetAddress);
-        this.port = port;
+    public MidiDingsOSCParams(Context context, String cmd) throws UnknownHostException {
+        setInetAddress(getOscRemoteHostFromPreferences(context));
+        this.port = getOscOutPortNumberFromPreferences(context);
         this.cmd = cmd;
         this.params = new ArrayList();
         Log.d(LOG_TAG, this.toString());
@@ -92,5 +84,20 @@ public class MidiDingsOSCParams {
         sb.append(", params:");
         sb.append(this.params.toString());
         return sb.toString();
+    }
+
+    private String getOscRemoteHostFromPreferences(Context context) {
+        return getPrefValueByKey(context, SettingsActivity.KEY_PREF_OSC_REMOTE_HOST, "");
+    }
+
+    private int getOscOutPortNumberFromPreferences(Context context) {
+        String s = getPrefValueByKey(context, SettingsActivity.KEY_PREF_OSC_OUTPUT_PORT, "");
+        return new Integer(s);
+    }
+
+    private String getPrefValueByKey(Context context, String key, String defaultValue) {
+        PreferenceManager.setDefaultValues(context, R.xml.preferences, false);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getString(key, defaultValue);
     }
 }
