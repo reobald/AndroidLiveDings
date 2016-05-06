@@ -1,11 +1,11 @@
 package com.electrophone.androidlivedings;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,7 +15,7 @@ import android.widget.Toast;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements LogConstant {
+public class MainActivity extends Activity implements LogConstant {
 
     public static final String SAVED_SCENES = "SAVED_SCENES";
     public static final String SAVED_CURRENT_SCENE = "SAVED_CURRENT_SCENE";
@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements LogConstant {
 
     public int getCurrentScene() {
         log("Get current scene");
-        SceneItemFragment sceneItemFragment = (SceneItemFragment) getSupportFragmentManager().findFragmentById(R.id.sceneItemFragment);
+        SceneItemFragment sceneItemFragment = (SceneItemFragment) getFragmentManager().findFragmentById(R.id.sceneItemFragment);
         int sceneNumber = sceneItemFragment.getSceneNumber() - dataOffset;
         return (sceneNumber < 0 ? 0 : sceneNumber);
     }
@@ -136,14 +136,14 @@ public class MainActivity extends AppCompatActivity implements LogConstant {
     public void updateCurrentScene(int sceneNumber) {
         log("Update current scene");
         SceneInfo sceneInfo = scenes.get(sceneNumber);
-        SceneItemFragment sceneItemFragment = (SceneItemFragment) getSupportFragmentManager().findFragmentById(R.id.sceneItemFragment);
+        SceneItemFragment sceneItemFragment = (SceneItemFragment) getFragmentManager().findFragmentById(R.id.sceneItemFragment);
         sceneItemFragment.setSceneInfo(sceneInfo);
     }
 
     public void updateSceneList(ArrayList<SceneInfo> sceneInfoList) {
         log("Update current scene list");
         scenes = sceneInfoList;
-        SceneListFragment sceneListFragment = (SceneListFragment) getSupportFragmentManager().findFragmentById(R.id.sceneListFragment);
+        SceneListFragment sceneListFragment = (SceneListFragment) getFragmentManager().findFragmentById(R.id.sceneListFragment);
         sceneListFragment.setSceneList(sceneInfoList);
     }
 
