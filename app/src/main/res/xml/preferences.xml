@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <EditTextPreference
-        android:defaultValue="192.168.0.1"
+        android:defaultValue="192.168.42.1"
         android:key="pref_osc_remote_host"
         android:persistent="true"
         android:summary="@string/pref_osc_remote_host_summary"
