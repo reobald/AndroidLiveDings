@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        tools:layout="@layout/patch_item_layout" />
+        tools:layout="@layout/scene_item_layout" />
 
     <View
         android:layout_width="match_parent"
@@ -33,5 +33,5 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/sceneItemFragment"
         android:layout_centerHorizontal="true"
-        tools:layout="@layout/patch_list_fragment" />
+        tools:layout="@layout/scene_list_fragment" />
 </RelativeLayout>

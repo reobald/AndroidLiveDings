@@ -22,7 +22,7 @@ public class SceneListFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.patch_list_fragment, container, false);
+        View view = inflater.inflate(R.layout.scene_list_fragment, container, false);
         sceneListView = (ListView) view.findViewById(R.id.sceneListView);
         sceneListView.setOnItemClickListener(
                 new AdapterView.OnItemClickListener() {

@@ -14,7 +14,7 @@ import java.util.ArrayList;
  */
 public class SceneListAdapter extends ArrayAdapter<SceneInfo> {
     SceneListAdapter(Context context, ArrayList<SceneInfo> resource) {
-        super(context, R.layout.patch_item_layout, resource);
+        super(context, R.layout.scene_item_layout, resource);
     }
 
     @Override
@@ -22,7 +22,7 @@ public class SceneListAdapter extends ArrayAdapter<SceneInfo> {
         SceneInfo sceneInfo = getItem(position);
 
         LayoutInflater l_inflater = LayoutInflater.from(getContext());
-        View patchItemView = l_inflater.inflate(R.layout.patch_item_layout, parent, false);
+        View patchItemView = l_inflater.inflate(R.layout.scene_item_layout, parent, false);
 
         String patchNumber = String.format("%03d.", sceneInfo.getNumber());
         TextView patchNumberView = (TextView) patchItemView.findViewById(R.id.sceneNumber);

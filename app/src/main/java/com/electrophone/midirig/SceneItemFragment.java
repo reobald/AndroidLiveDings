@@ -23,7 +23,7 @@ public class SceneItemFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.patch_item_layout, container, false);
+        View view = inflater.inflate(R.layout.scene_item_layout, container, false);
         sceneNumber = (TextView) view.findViewById(R.id.sceneNumber);
         sceneName = (TextView) view.findViewById(R.id.sceneName);
         return view;
