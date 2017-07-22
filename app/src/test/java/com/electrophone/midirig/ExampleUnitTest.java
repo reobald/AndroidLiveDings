@@ -18,18 +18,16 @@
 
 package com.electrophone.midirig;
 
-import android.os.Bundle;
-import android.preference.PreferenceActivity;
+import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 
-public class SettingsActivity extends PreferenceActivity {
-    public static final String KEY_PREF_OSC_OUTPUT_PORT = "pref_osc_output_port";
-    public static final String KEY_PREF_OSC_INPUT_PORT = "pref_osc_input_port";
-    public static final String KEY_PREF_OSC_REMOTE_HOST = "pref_osc_remote_host";
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        addPreferencesFromResource(R.xml.preferences);
+/**
+ * To work on unit tests, switch the Test Artifact in the Build Variants view.
+ */
+public class ExampleUnitTest {
+    @Test
+    public void addition_isCorrect() throws Exception {
+        assertEquals(4, 2 + 2);
     }
 }

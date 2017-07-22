@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/AndroidLiveDings.iml" filepath="$PROJECT_DIR$/AndroidLiveDings.iml" />
+      <module fileurl="file://$PROJECT_DIR$/MidiRig.iml" filepath="$PROJECT_DIR$/MidiRig.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
