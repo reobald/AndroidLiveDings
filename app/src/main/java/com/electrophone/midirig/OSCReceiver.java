@@ -48,7 +48,7 @@ public class OSCReceiver implements LogConstant {
     boolean updating = false;
     private OSCPortIn oscPort;
     private int dataOffset = DEFAULT_DATA_OFFSET;
-    private ArrayList<SceneInfo> updatedScenes = null;
+    private SceneInfoMap updatedScenes = null;
 
     private MainActivity mainActivity;
     private OSCListener dataOffsetListener = new OSCListener() {
@@ -64,7 +64,7 @@ public class OSCReceiver implements LogConstant {
         public void acceptMessage(Date time, OSCMessage message) {
             if (!updating) {
                 updating = true;
-                updatedScenes = new ArrayList<SceneInfo>();
+                updatedScenes = new SceneInfoMap();
                 log("Incoming begin_scenes message", message);
             }
         }
@@ -75,7 +75,7 @@ public class OSCReceiver implements LogConstant {
             log("Incoming add_scene message", message);
             SceneInfo sceneInfo = createSceneInfoFromOscMessage(message);
             if (sceneInfo != null) {
-                updatedScenes.add(sceneInfo);
+                updatedScenes.put(sceneInfo);
             } else {
                 log("Could not create SceneInfo from OSC message", message);
             }
@@ -122,6 +122,12 @@ public class OSCReceiver implements LogConstant {
             log("Starting OSC server");
             oscPort.startListening();
             log("OSC server started, listening on port number: " + Integer.toString(oscInPortNr));
+
+            //TEST
+            updatedScenes = generateTestData();
+            sendUpdateScenesMessage();
+            sendUpdateCurrentSceneMessage(1);
+
 
         } catch (SocketException e) {
             e.printStackTrace();
@@ -197,7 +203,7 @@ public class OSCReceiver implements LogConstant {
     private void sendUpdateScenesMessage() {
         Bundle data = new Bundle();
         data.putInt(ACTION, UPDATE_SCENES);
-        data.putParcelableArrayList(ALL_SCENES, updatedScenes);
+        data.putParcelable(ALL_SCENES, updatedScenes);
         Message msg = new Message();
         msg.setData(data);
         Handler handler = mainActivity.getHandler();
@@ -232,18 +238,18 @@ public class OSCReceiver implements LogConstant {
         Log.d(LOG_TAG, msg);
     }
 
- /*   private ArrayList<SceneInfo> generateTestData() {
+    private SceneInfoMap generateTestData() {
         String[] list = new String[]{
                 "Rhodes", "Brass", "Lead", "Strings", "Organ", "Guitar",
                 "Marimba", "Lead", "Bass", "Banjo", "Sitar", "Mandolin",
                 "Pad", "Synth Bass", "Bells", "Chimes", "Vibraphone",
-                "Wurlitzer", "Theremin"};
+                "Wurlitzer", "Theremin", "Everybody wants to rule the world"};
 
         String scene;
         int number;
         ArrayList<SceneInfo> subscenes;
         SceneInfo testDataItem;
-        ArrayList<SceneInfo> testData = new ArrayList<>();
+        SceneInfoMap testData = new SceneInfoMap();
 
 
         for (int i = 0; i < list.length; i++) {
@@ -251,10 +257,9 @@ public class OSCReceiver implements LogConstant {
             number = i;
             subscenes = new ArrayList<>();
             testDataItem = new SceneInfo(number, scene, subscenes);
-            testData.add(testDataItem);
+            testData.put(testDataItem);
         }
         return testData;
     }
-    */
 
 }

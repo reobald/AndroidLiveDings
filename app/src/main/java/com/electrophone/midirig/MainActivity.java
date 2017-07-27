@@ -30,7 +30,6 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 
 public class MainActivity extends Activity implements LogConstant {
 
@@ -38,7 +37,7 @@ public class MainActivity extends Activity implements LogConstant {
     public static final String SAVED_CURRENT_SCENE = "SAVED_CURRENT_SCENE";
     public static final String SAVED_DATA_OFFSET = "SAVED_DATA_OFFSET";
     OSCUpdatesHandler handler;
-    private ArrayList<SceneInfo> scenes = null;
+    private SceneInfoMap scenes = null;
     private int dataOffset;
     private OSCReceiver oscReceiver;
 
@@ -62,21 +61,21 @@ public class MainActivity extends Activity implements LogConstant {
 
         if (savedInstanceState != null) {
 
-            scenes = savedInstanceState.getParcelableArrayList(SAVED_SCENES);
+            scenes = savedInstanceState.getParcelable(SAVED_SCENES);
 
-            if (scenes != null) {
+            if ((scenes == null) || (scenes.isEmpty())) {
+                log("transmit query");
+                transmitQuery();
+            } else {
                 log("Recreating saved instance state");
                 dataOffset = savedInstanceState.getInt(SAVED_DATA_OFFSET);
                 setDataOffset(dataOffset);
 
                 int currentScene = savedInstanceState.getInt(SAVED_CURRENT_SCENE);
                 updateCurrentScene(currentScene);
-                updateSceneList(scenes);
+                updateScenelistFragment();
             }
 
-        } else {
-            log("transmit query");
-            transmitQuery();
         }
     }
 
@@ -102,7 +101,7 @@ public class MainActivity extends Activity implements LogConstant {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         log("Saving instance state");
-        outState.putParcelableArrayList(SAVED_SCENES, scenes);
+        outState.putParcelable(SAVED_SCENES, scenes);
         outState.putInt(SAVED_CURRENT_SCENE, getCurrentScene());
         outState.putInt(SAVED_DATA_OFFSET, dataOffset);
         super.onSaveInstanceState(outState);
@@ -155,11 +154,15 @@ public class MainActivity extends Activity implements LogConstant {
         sceneItemFragment.setSceneInfo(sceneInfo);
     }
 
-    public void updateSceneList(ArrayList<SceneInfo> sceneInfoList) {
+    public void updateScenelistFragment() {
         log("Update current scene list");
-        scenes = sceneInfoList;
         SceneListFragment sceneListFragment = (SceneListFragment) getFragmentManager().findFragmentById(R.id.sceneListFragment);
-        sceneListFragment.setSceneList(sceneInfoList);
+        sceneListFragment.setSceneList(scenes.values());
+    }
+
+    public void updateScenes(SceneInfoMap scenes) {
+        this.scenes = scenes;
+        updateScenelistFragment();
     }
 
     public Handler getHandler() {

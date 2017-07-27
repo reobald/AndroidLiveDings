@@ -22,6 +22,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 
 public class SceneInfo implements Parcelable {
@@ -36,7 +37,22 @@ public class SceneInfo implements Parcelable {
             return new SceneInfo[size];
         }
     };
-
+    public static Comparator<SceneInfo> alphabeticalComparator = new Comparator<SceneInfo>() {
+        @Override
+        public int compare(SceneInfo lhs, SceneInfo rhs) {
+            String a = lhs.getSceneName();
+            String b = rhs.getSceneName();
+            return a.compareTo(b);
+        }
+    };
+    public static Comparator<SceneInfo> numericalComparator = new Comparator<SceneInfo>() {
+        @Override
+        public int compare(SceneInfo lhs, SceneInfo rhs) {
+            Integer a = lhs.getNumber();
+            Integer b = rhs.getNumber();
+            return a.compareTo(b);
+        }
+    };
     private int number;
     private String sceneName;
     private ArrayList<SceneInfo> subscenes;

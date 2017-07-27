@@ -23,7 +23,6 @@ import android.os.Handler;
 import android.os.Message;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 
 public class OSCUpdatesHandler extends Handler {
     private WeakReference<MainActivity> activity;
@@ -43,8 +42,8 @@ public class OSCUpdatesHandler extends Handler {
                 activity.get().updateCurrentScene(currentScene);
                 break;
             case OSCReceiver.UPDATE_SCENES:
-                ArrayList<SceneInfo> scenes = data.getParcelableArrayList(OSCReceiver.ALL_SCENES);
-                activity.get().updateSceneList(scenes);
+                SceneInfoMap scenes = data.getParcelable(OSCReceiver.ALL_SCENES);
+                activity.get().updateScenes(scenes);
                 break;
         }
         super.handleMessage(msg);

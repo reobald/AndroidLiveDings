@@ -29,6 +29,7 @@ import android.widget.Toast;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
 
 
 public class SceneListFragment extends Fragment {
@@ -59,6 +60,9 @@ public class SceneListFragment extends Fragment {
             oscParams.addParam(sceneInfo.getNumber());
             OSCTransmitter transmitter = new OSCTransmitter(getActivity());
             transmitter.execute(oscParams);
+
+            //TEST
+            ((MainActivity) getActivity()).updateCurrentScene(sceneInfo.getNumber());
         } catch (UnknownHostException e) {
             Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
         }
@@ -89,6 +93,7 @@ public class SceneListFragment extends Fragment {
     }
 
     public void setSceneList(ArrayList<SceneInfo> sceneList) {
+        Collections.sort(sceneList, SceneInfo.numericalComparator);
         SceneListAdapter sceneListAdapter = new SceneListAdapter(getActivity(), sceneList);
         sceneListView.setAdapter(sceneListAdapter);
         sceneListAdapter.notifyDataSetChanged();
