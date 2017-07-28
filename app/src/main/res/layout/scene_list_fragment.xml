@@ -1,14 +1,42 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:isScrollContainer="false"
+    android:orientation="vertical"
     tools:context=".SceneListFragment">
 
     <!-- TODO: Update blank fragment layout -->
+    <RadioGroup
+        android:id="@+id/sortRdGrp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp">
 
+        <RadioButton
+            android:id="@+id/numericSortRdBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_weight="1"
+            android:button="@android:drawable/arrow_down_float"
+            android:minWidth="75dp" />
+
+        <RadioButton
+            android:id="@+id/alphabeticSortRdBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:button="@android:drawable/arrow_down_float" />
+
+    </RadioGroup>
     <ListView
         android:id="@+id/sceneListView"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp" />
-</FrameLayout>
+        android:layout_height="fill_parent"
+        android:layout_marginTop="30dp"
+        android:paddingBottom="100dp" />
+</LinearLayout>

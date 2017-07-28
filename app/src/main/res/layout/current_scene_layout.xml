@@ -20,6 +20,7 @@
         android:id="@+id/sceneName"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
         android:text="Updating..."
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textIsSelectable="false"

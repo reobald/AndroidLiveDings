@@ -42,7 +42,7 @@ public class SceneInfo implements Parcelable {
         public int compare(SceneInfo lhs, SceneInfo rhs) {
             String a = lhs.getSceneName();
             String b = rhs.getSceneName();
-            return a.compareTo(b);
+            return a.compareToIgnoreCase(b);
         }
     };
     public static Comparator<SceneInfo> numericalComparator = new Comparator<SceneInfo>() {

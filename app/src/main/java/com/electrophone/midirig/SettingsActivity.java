@@ -27,6 +27,8 @@ public class SettingsActivity extends Activity {
     public static final String KEY_PREF_OSC_OUTPUT_PORT = "pref_osc_output_port";
     public static final String KEY_PREF_OSC_INPUT_PORT = "pref_osc_input_port";
     public static final String KEY_PREF_OSC_REMOTE_HOST = "pref_osc_remote_host";
+    public static final String KEY_PREF_ALPHABETICAL_SORT = "pref_alphabetical_sort";
+    public static final String KEY_PREF_DEMO_MODE = "pref_demo_mode";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

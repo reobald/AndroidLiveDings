@@ -19,12 +19,15 @@
 package com.electrophone.midirig;
 
 import android.app.Fragment;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import java.net.UnknownHostException;
@@ -49,7 +52,33 @@ public class SceneListFragment extends Fragment {
                     }
                 }
         );
+        RadioGroup sortRdGrp = (RadioGroup) view.findViewById(R.id.sortRdGrp);
+        sortRdGrp.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(sceneListView.getContext());
+                SharedPreferences.Editor prefsEditor = prefs.edit();
+                switch (checkedId) {
+                    case R.id.numericSortRdBtn:
+                        prefsEditor.putBoolean(SettingsActivity.KEY_PREF_ALPHABETICAL_SORT, false);
+                        prefsEditor.apply();
+                        break;
+                    case R.id.alphabeticSortRdBtn:
+                        prefsEditor.putBoolean(SettingsActivity.KEY_PREF_ALPHABETICAL_SORT, true);
+                        prefsEditor.apply();
+                        break;
+                    default:
+                        //ignore
+                        break;
+                }
+
+                if (isDemoMode()) {
+                    ((MainActivity) sceneListView.getContext()).updateScenelistFragment();
+                }
+            }
+        });
         return view;
+
     }
 
     private void selectScene(SceneInfo sceneInfo) {
@@ -61,41 +90,28 @@ public class SceneListFragment extends Fragment {
             OSCTransmitter transmitter = new OSCTransmitter(getActivity());
             transmitter.execute(oscParams);
 
-            //TEST
+
             ((MainActivity) getActivity()).updateCurrentScene(sceneInfo.getNumber());
         } catch (UnknownHostException e) {
             Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
-    private ArrayList<SceneInfo> generateTestData() {
-        String[] list = new String[]{
-                "Rhodes", "Brass", "Lead", "Strings", "Organ", "Guitar",
-                "Marimba", "Lead", "Bass", "Banjo", "Sitar", "Mandolin",
-                "Pad", "Synth Bass", "Bells", "Chimes", "Vibraphone",
-                "Wurlitzer", "Theremin"};
-
-        String scene;
-        int number;
-        ArrayList<SceneInfo> subscenes;
-        SceneInfo testDataItem;
-        ArrayList<SceneInfo> testData = new ArrayList<>();
-
-
-        for (int i = 0; i < list.length; i++) {
-            scene = list[i];
-            number = i;
-            subscenes = new ArrayList<>();
-            testDataItem = new SceneInfo(number, scene, subscenes);
-            testData.add(testDataItem);
-        }
-        return testData;
-    }
-
     public void setSceneList(ArrayList<SceneInfo> sceneList) {
-        Collections.sort(sceneList, SceneInfo.numericalComparator);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(sceneListView.getContext());
+        boolean sortAlphabetically = prefs.getBoolean(SettingsActivity.KEY_PREF_ALPHABETICAL_SORT, false);
+        if (sortAlphabetically) {
+            Collections.sort(sceneList, SceneInfo.alphabeticalComparator);
+        } else {
+            Collections.sort(sceneList, SceneInfo.numericalComparator);
+        }
         SceneListAdapter sceneListAdapter = new SceneListAdapter(getActivity(), sceneList);
         sceneListView.setAdapter(sceneListAdapter);
         sceneListAdapter.notifyDataSetChanged();
+    }
+
+    private boolean isDemoMode() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences((getActivity()));
+        return prefs.getBoolean(SettingsActivity.KEY_PREF_DEMO_MODE, false);
     }
 }

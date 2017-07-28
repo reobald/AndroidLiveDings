@@ -11,4 +11,10 @@
     <string name="pref_osc_input_port_title">Input port</string>
     <string name="pref_osc_input_port_summary">The port number on this device to listen for incoming OSC messages on</string>
 
+    <string name="pref_alphabetical_sort_title">Sort alphabetically</string>
+    <string name="pref_alphabetical_sort_summary">Sort alphabetically (default is numerical sort)</string>
+
+    <string name="pref_demo_mode_title">Demo mode</string>
+    <string name="pref_demo_mode_summary">Use app with dummy data</string>
+
 </resources>

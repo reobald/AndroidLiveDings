@@ -123,10 +123,11 @@ public class OSCReceiver implements LogConstant {
             oscPort.startListening();
             log("OSC server started, listening on port number: " + Integer.toString(oscInPortNr));
 
-            //TEST
-            updatedScenes = generateTestData();
-            sendUpdateScenesMessage();
-            sendUpdateCurrentSceneMessage(1);
+            if (isDemoMode()) {
+                updatedScenes = generateTestData();
+                sendUpdateScenesMessage();
+                sendUpdateCurrentSceneMessage(1);
+            }
 
 
         } catch (SocketException e) {
@@ -243,7 +244,8 @@ public class OSCReceiver implements LogConstant {
                 "Rhodes", "Brass", "Lead", "Strings", "Organ", "Guitar",
                 "Marimba", "Lead", "Bass", "Banjo", "Sitar", "Mandolin",
                 "Pad", "Synth Bass", "Bells", "Chimes", "Vibraphone",
-                "Wurlitzer", "Theremin", "Everybody wants to rule the world"};
+                "Wurlitzer", "Theremin", "Everybody wants to rule the world",
+                "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "aa", "bb", "cc"};
 
         String scene;
         int number;
@@ -260,6 +262,11 @@ public class OSCReceiver implements LogConstant {
             testData.put(testDataItem);
         }
         return testData;
+    }
+
+    private boolean isDemoMode() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mainActivity);
+        return prefs.getBoolean(SettingsActivity.KEY_PREF_DEMO_MODE, false);
     }
 
 }
