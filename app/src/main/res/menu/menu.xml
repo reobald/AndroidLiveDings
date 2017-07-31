@@ -2,7 +2,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
     <item
+        android:id="@+id/refresh"
+        android:icon="@android:drawable/ic_popup_sync"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_item_refresh_title"
+        tools:ignore="AppCompatResource" />
+    <item
         android:id="@+id/settings"
+        android:icon="@android:drawable/ic_menu_preferences"
+        android:showAsAction="ifRoom"
         android:title="@string/menu_item_settings_title"
         tools:ignore="AppCompatResource" />
 </menu>

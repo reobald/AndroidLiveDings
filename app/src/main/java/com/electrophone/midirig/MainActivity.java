@@ -93,6 +93,8 @@ public class MainActivity extends Activity implements LogConstant {
             case R.id.settings:
                 Intent i = new Intent(com.electrophone.midirig.MainActivity.this, com.electrophone.midirig.SettingsActivity.class);
                 startActivity(i);
+            case R.id.refresh:
+                transmitQuery();
             default:
                 return super.onOptionsItemSelected(item);
         }
