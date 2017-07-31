@@ -27,7 +27,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import java.net.UnknownHostException;
@@ -52,31 +51,6 @@ public class SceneListFragment extends Fragment {
                     }
                 }
         );
-        RadioGroup sortRdGrp = (RadioGroup) view.findViewById(R.id.sortRdGrp);
-        sortRdGrp.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(sceneListView.getContext());
-                SharedPreferences.Editor prefsEditor = prefs.edit();
-                switch (checkedId) {
-                    case R.id.numericSortRdBtn:
-                        prefsEditor.putBoolean(SettingsActivity.KEY_PREF_ALPHABETICAL_SORT, false);
-                        prefsEditor.apply();
-                        break;
-                    case R.id.alphabeticSortRdBtn:
-                        prefsEditor.putBoolean(SettingsActivity.KEY_PREF_ALPHABETICAL_SORT, true);
-                        prefsEditor.apply();
-                        break;
-                    default:
-                        //ignore
-                        break;
-                }
-
-                if (isDemoMode()) {
-                    ((MainActivity) sceneListView.getContext()).updateScenelistFragment();
-                }
-            }
-        });
         return view;
 
     }

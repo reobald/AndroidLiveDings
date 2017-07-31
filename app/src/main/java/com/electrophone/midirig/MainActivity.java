@@ -156,8 +156,10 @@ public class MainActivity extends Activity implements LogConstant {
 
     public void updateScenelistFragment() {
         log("Update current scene list");
-        SceneListFragment sceneListFragment = (SceneListFragment) getFragmentManager().findFragmentById(R.id.sceneListFragment);
-        sceneListFragment.setSceneList(scenes.values());
+        if (scenes != null) {
+            SceneListFragment sceneListFragment = (SceneListFragment) getFragmentManager().findFragmentById(R.id.sceneListFragment);
+            sceneListFragment.setSceneList(scenes.values());
+        }
     }
 
     public void updateScenes(SceneInfoMap scenes) {

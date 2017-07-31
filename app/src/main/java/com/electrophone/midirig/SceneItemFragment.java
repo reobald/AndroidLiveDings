@@ -19,8 +19,11 @@
 package com.electrophone.midirig;
 
 import android.app.Fragment;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +45,23 @@ public class SceneItemFragment extends Fragment {
         View view = inflater.inflate(R.layout.current_scene_layout, container, false);
         sceneNumber = (TextView) view.findViewById(R.id.sceneNumber);
         sceneName = (TextView) view.findViewById(R.id.sceneName);
+
+        sceneName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(LogConstant.LOG_TAG, "Sort alphabetically");
+                sortAlphabetically(true);
+            }
+        });
+
+        sceneNumber.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(LogConstant.LOG_TAG, "Sort numerically");
+                sortAlphabetically(false);
+            }
+        });
+
         return view;
     }
 
@@ -58,5 +78,13 @@ public class SceneItemFragment extends Fragment {
         if (tokens.length > 0) {
             return Integer.getInteger(tokens[0]);
         } else return 0;
+    }
+
+    public void sortAlphabetically(boolean choice) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean(SettingsActivity.KEY_PREF_ALPHABETICAL_SORT, choice);
+        editor.apply();
+        ((MainActivity) getActivity()).updateScenelistFragment();
     }
 }
