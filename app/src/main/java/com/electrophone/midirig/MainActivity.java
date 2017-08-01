@@ -35,10 +35,8 @@ public class MainActivity extends Activity implements LogConstant {
 
     public static final String SAVED_SCENES = "SAVED_SCENES";
     public static final String SAVED_CURRENT_SCENE = "SAVED_CURRENT_SCENE";
-    public static final String SAVED_DATA_OFFSET = "SAVED_DATA_OFFSET";
     OSCUpdatesHandler handler;
     private SceneInfoMap scenes = null;
-    private int dataOffset;
     private OSCReceiver oscReceiver;
 
     @Override
@@ -68,8 +66,6 @@ public class MainActivity extends Activity implements LogConstant {
                 transmitQuery();
             } else {
                 log("Recreating saved instance state");
-                dataOffset = savedInstanceState.getInt(SAVED_DATA_OFFSET);
-                setDataOffset(dataOffset);
 
                 int currentScene = savedInstanceState.getInt(SAVED_CURRENT_SCENE);
                 if (currentScene > -1)
@@ -109,7 +105,6 @@ public class MainActivity extends Activity implements LogConstant {
         outState.putParcelable(SAVED_SCENES, scenes);
         //SceneInfo currentScene = getCurrentScene();
         outState.putInt(SAVED_CURRENT_SCENE, getCurrentScene());
-        outState.putInt(SAVED_DATA_OFFSET, dataOffset);
         super.onSaveInstanceState(outState);
     }
 
@@ -176,9 +171,6 @@ public class MainActivity extends Activity implements LogConstant {
         return handler;
     }
 
-    public void setDataOffset(int dataOffset) {
-        this.dataOffset = dataOffset;
-    }
 
     private void log(String msg) {
         Log.d(LOG_TAG, msg);

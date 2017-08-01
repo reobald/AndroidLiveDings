@@ -47,16 +47,14 @@ public class OSCReceiver implements LogConstant {
 
     boolean updating = false;
     private OSCPortIn oscPort;
-    private int dataOffset = DEFAULT_DATA_OFFSET;
     private SceneInfoMap updatedScenes = null;
 
     private MainActivity mainActivity;
     private OSCListener dataOffsetListener = new OSCListener() {
         @Override
         public void acceptMessage(Date time, OSCMessage message) {
-            dataOffset = (int) message.getArguments().get(0);
-            mainActivity.setDataOffset(dataOffset);
-            log("Incoming data_offset message", message);
+            //ignore, just log the event and move on
+            log("Incoming data_offset message, ignoring this", message);
         }
     };
     private OSCListener beginScenesListener = new OSCListener() {
@@ -96,7 +94,6 @@ public class OSCReceiver implements LogConstant {
         public void acceptMessage(Date time, OSCMessage message) {
             log("incomingCurrentSceneMessage", message);
             int currentSceneNr = (int) message.getArguments().get(0);
-            //currentSceneNr -= dataOffset;
             sendUpdateCurrentSceneMessage(currentSceneNr);
         }
     };
