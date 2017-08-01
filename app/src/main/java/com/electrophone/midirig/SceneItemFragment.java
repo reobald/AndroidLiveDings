@@ -38,6 +38,8 @@ public class SceneItemFragment extends Fragment {
     private TextView sceneNumber;
     private TextView sceneName;
 
+    private int currentScene = -1;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -66,18 +68,14 @@ public class SceneItemFragment extends Fragment {
     }
 
     public void setSceneInfo(SceneInfo sceneInfo) {
+        currentScene = sceneInfo.getNumber();
         String nr = String.format(FORMAT, sceneInfo.getNumber());
         this.sceneNumber.setText(nr);
         this.sceneName.setText(sceneInfo.getSceneName());
     }
 
     public int getSceneNumber() {
-        String t = sceneNumber.getText().toString();
-        String delimiters = DELIMITER;
-        String[] tokens = t.split(delimiters);
-        if (tokens.length > 0) {
-            return Integer.getInteger(tokens[0]);
-        } else return 0;
+        return currentScene;
     }
 
     public void sortAlphabetically(boolean choice) {

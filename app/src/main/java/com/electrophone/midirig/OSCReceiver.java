@@ -96,7 +96,7 @@ public class OSCReceiver implements LogConstant {
         public void acceptMessage(Date time, OSCMessage message) {
             log("incomingCurrentSceneMessage", message);
             int currentSceneNr = (int) message.getArguments().get(0);
-            currentSceneNr -= dataOffset;
+            //currentSceneNr -= dataOffset;
             sendUpdateCurrentSceneMessage(currentSceneNr);
         }
     };
@@ -256,7 +256,7 @@ public class OSCReceiver implements LogConstant {
 
         for (int i = 0; i < list.length; i++) {
             scene = list[i];
-            number = i;
+            number = i + 1;
             subscenes = new ArrayList<>();
             testDataItem = new SceneInfo(number, scene, subscenes);
             testData.put(testDataItem);

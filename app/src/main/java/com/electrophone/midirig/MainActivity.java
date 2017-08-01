@@ -72,10 +72,13 @@ public class MainActivity extends Activity implements LogConstant {
                 setDataOffset(dataOffset);
 
                 int currentScene = savedInstanceState.getInt(SAVED_CURRENT_SCENE);
-                updateCurrentScene(currentScene);
+                if (currentScene > -1)
+                    updateCurrentScene(currentScene);
                 updateScenelistFragment();
             }
 
+        } else {
+            transmitQuery();
         }
     }
 
@@ -104,6 +107,7 @@ public class MainActivity extends Activity implements LogConstant {
     protected void onSaveInstanceState(Bundle outState) {
         log("Saving instance state");
         outState.putParcelable(SAVED_SCENES, scenes);
+        //SceneInfo currentScene = getCurrentScene();
         outState.putInt(SAVED_CURRENT_SCENE, getCurrentScene());
         outState.putInt(SAVED_DATA_OFFSET, dataOffset);
         super.onSaveInstanceState(outState);
@@ -145,8 +149,7 @@ public class MainActivity extends Activity implements LogConstant {
     public int getCurrentScene() {
         log("Get current scene");
         SceneItemFragment sceneItemFragment = (SceneItemFragment) getFragmentManager().findFragmentById(R.id.sceneItemFragment);
-        int sceneNumber = sceneItemFragment.getSceneNumber() - dataOffset;
-        return (sceneNumber < 0 ? 0 : sceneNumber);
+        return (sceneItemFragment.getSceneNumber());
     }
 
     public void updateCurrentScene(int sceneNumber) {
